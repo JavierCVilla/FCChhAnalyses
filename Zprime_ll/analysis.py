@@ -8,7 +8,10 @@ logging.shutdown()
 reload(logging)
 logging.basicConfig(level=logging.WARNING)
 
-sample=imp.load_source('heppylist', '/afs/cern.ch/work/h/helsens/public/FCCDicts/FCC_heppySampleList_fcc_v02.py')
+import sys
+sys.path.insert(0,os.path.realpath(os.curdir))
+
+sample=imp.load_source('heppylist', '/eos/experiment/fcc/hh/utils/FCCDicts/FCC_heppySampleList_fcc_v02.py')
 
 comp = cfg.Component(
     'example',
@@ -25,10 +28,10 @@ selectedComponents = [
                         sample.p8_pp_Zprime_30TeV_ll,
                         sample.p8_pp_Zprime_35TeV_ll,
                         sample.p8_pp_Zprime_40TeV_ll,
-                        sample.p8_pp_Zprime_45TeV_ll, 
-                        sample.p8_pp_Zprime_50TeV_ll, 
+                        sample.p8_pp_Zprime_45TeV_ll,
+                        sample.p8_pp_Zprime_50TeV_ll,
                         #sample.mgp8_pp_ee_lo,
-                        #sample.mgp8_pp_mumu_lo,  
+                        #sample.mgp8_pp_mumu_lo,
                         #sample.mgp8_pp_Zprime_mumu_5f_Mzp_4TeV,
                         #sample.mgp8_pp_Zprime_mumu_5f_Mzp_6TeV,
                         #sample.mgp8_pp_Zprime_mumu_5f_Mzp_8TeV,
@@ -46,6 +49,9 @@ selectedComponents = [
                         #sample.mgp8_pp_Zprime_mumu_5f_Mzp_45TeV,
                         #sample.mgp8_pp_mumu_lo_2TeV,
                      ]
+
+for s in selectedComponents:
+    s.files = [ f.replace('root://eospublic.cern.ch/', '') for f in s.files ]
 
 sample.p8_pp_Zprime_15TeV_ll.splitFactor = 10
 sample.p8_pp_Zprime_20TeV_ll.splitFactor = 10
@@ -76,8 +82,10 @@ sample.mgp8_pp_mumu_lo_2TeV.splitFactor = 40
 
 #selectedComponents = [comp]
 
-
-from heppy.FCChhAnalyses.analyzers.Reader import Reader
+try:
+    from heppy.FCChhAnalyses.analyzers.Reader import Reader
+except ImportError:
+    from FCChhAnalyses.analyzers.Reader import Reader
 
 source = cfg.Analyzer(
     Reader,
@@ -98,7 +106,7 @@ source = cfg.Analyzer(
     bTags = 'pfbTags04',
 
     photons = 'photons',
-    
+
     pfphotons = 'pfphotons',
     pfcharged = 'pfcharged',
     pfneutrals = 'pfneutrals',
@@ -143,7 +151,7 @@ selected_electrons = cfg.Analyzer(
 from heppy.analyzers.Merger import Merger
 selected_leptons = cfg.Analyzer(
       Merger,
-      instance_label = 'selected_leptons', 
+      instance_label = 'selected_leptons',
       inputs = ['selected_electrons','selected_muons'],
       output = 'selected_leptons'
 )
@@ -175,7 +183,10 @@ jets_nolepton = cfg.Analyzer(
 
 
 
-from heppy.FCChhAnalyses.Zprime_ll.selection import Selection
+try:
+    from heppy.FCChhAnalyses.Zprime_ll.selection import Selection
+except ImportError:
+    from FCChhAnalyses.Zprime_ll.selection import Selection
 selection = cfg.Analyzer(
     Selection,
     instance_label='cuts'
@@ -199,15 +210,21 @@ zprime_muon = cfg.Analyzer(
       pdgid = 32
 )
 
-# apply event selection. 
-from heppy.FCChhAnalyses.Zprime_ll.selection import Selection
+# apply event selection.
+try:
+    from heppy.FCChhAnalyses.Zprime_ll.selection import Selection
+except ImportError:
+    from FCChhAnalyses.Zprime_ll.selection import Selection
 selection = cfg.Analyzer(
     Selection,
     instance_label='cuts'
 )
 
 # store interesting quantities into flat ROOT tree
-from heppy.FCChhAnalyses.Zprime_ll.TreeProducer import TreeProducer
+try:
+    from heppy.FCChhAnalyses.Zprime_ll.TreeProducer import TreeProducer
+except ImportError:
+    from FCChhAnalyses.Zprime_ll.TreeProducer import TreeProducer
 reco_tree = cfg.Analyzer(
     TreeProducer,
     jets='jets_nolepton',
