@@ -16,7 +16,7 @@ sample=imp.load_source('heppylist', '/eos/experiment/fcc/hh/utils/FCCDicts/FCC_h
 comp = cfg.Component(
     'example',
     files = ["/eos/experiment/fcc/hh/generation/DelphesEvents/fcc_v02/mgp8_pp_mumu_lo/events_000000001.root"]
-
+    #files = ["/eos/experiment/fcc/hh/generation/DelphesEvents/cms/p8_pp_Zprime_20TeV_ll/events_014349043.root"]
 )
 
 selectedComponents = [
@@ -193,7 +193,11 @@ selection = cfg.Analyzer(
 )
 
 # create Z' boson candidates
-from heppy.analyzers.ResonanceBuilder import ResonanceBuilder
+try:
+   from heppy.FCChhAnalyses.analyzers.ResonanceBuilder import ResonanceBuilder
+except ImportError:
+   from FCChhAnalyses.analyzers.ResonanceBuilder import ResonanceBuilder
+
 zprime_ele = cfg.Analyzer(
       ResonanceBuilder,
       output = 'zprime_ele',
@@ -202,7 +206,7 @@ zprime_ele = cfg.Analyzer(
 )
 
 # create Z' boson candidates
-from heppy.analyzers.ResonanceBuilder import ResonanceBuilder
+#from heppy.FCChhAnalyses.analyzers.ResonanceBuilder import ResonanceBuilder
 zprime_muon = cfg.Analyzer(
       ResonanceBuilder,
       output = 'zprime_muon',
